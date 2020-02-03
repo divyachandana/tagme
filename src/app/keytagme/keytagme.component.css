@@ -1,0 +1,27 @@
+.center {
+    margin: auto;
+    width: 82%;
+    /* border: 0.5px solid grey; */
+    padding: 10px;
+  }
+
+  .frame {
+    height: 100px;      /* equals max image height */
+    width: 100px;
+    border: 1px solid red;
+    white-space: nowrap;
+    
+    text-align: center; margin: 1em 0;
+}
+
+  .helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.txt-area-center {
+  display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

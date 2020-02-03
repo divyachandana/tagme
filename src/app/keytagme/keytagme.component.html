@@ -1,0 +1,60 @@
+<div class="center">
+
+    <mat-grid-list cols="3" rowHeight = "300px">
+        <mat-grid-tile>
+            <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
+   
+            <div>
+                <div *ngIf="toggleText=='show'">
+                    <div *ngFor="let sd of showtxtFileData">
+                        {{sd}}
+                    </div>
+                </div>
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile>{{jsonData[imageCurrIndex].keyTag}}</mat-grid-tile>
+        <mat-grid-tile></mat-grid-tile>
+
+        <mat-grid-tile>
+            <img src="./assets/left-arrow.png" style="height:100px;width:100px;vertical-align: top;">
+            <div *ngIf="imagePrevIndex!=-1">
+                <p style="text-align: center;">Name Here</p>
+                <img  [src]=jsonData[imagePrevIndex].imageUrl
+                style="height:150px;width:150px;padding:10px;">
+            </div>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <img [src]=jsonData[imageCurrIndex].imageUrl style="height:500px;width:500px;">
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <div *ngIf="imageNextIndex!=jsonDataLen" >
+                <p style="text-align: center;">Name Here</p>
+                <img [src]=jsonData[imageNextIndex].imageUrl
+                style="height:150px;width:150px;padding:10px;">
+            </div>   
+            <img src="./assets/right-arrow.png" style="height:100px;width:100px;vertical-align: top;">
+        </mat-grid-tile>
+
+        <mat-grid-tile>7</mat-grid-tile>
+        <mat-grid-tile>
+            <textarea class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+            [(ngModel)]=jsonData[imageCurrIndex].notes placeholder="Describe the image" style="text-align: left;" rows="12"
+            cols="80"></textarea>
+        </mat-grid-tile>
+        <mat-grid-tile>9</mat-grid-tile>
+
+        <mat-grid-tile>10</mat-grid-tile>
+        <mat-grid-tile>11</mat-grid-tile>
+        <mat-grid-tile>12</mat-grid-tile>
+    </mat-grid-list>
+
+    <!-- <p style="text-align: center;font-size: medium;color: brown;font-weight: 600;">{{jsonData[imageCurrIndex].timeSpent}}</p> -->
+
+
+
+    
+    
+
+  
+
+</div>

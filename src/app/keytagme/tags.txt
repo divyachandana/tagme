@@ -1,0 +1,3 @@
+H : House
+D : Departments
+N : Not House/Departments
