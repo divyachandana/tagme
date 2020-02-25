@@ -1,7 +1,8 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import data from './storeddata.json';
+import { Component, OnInit, HostListener, NgZone } from '@angular/core';
+// import data from './storeddata.json';
 import { saveAs } from 'file-saver';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-keytagme',
   templateUrl: './keytagme.component.html',
@@ -60,8 +61,8 @@ export class KeytagmeComponent implements OnInit {
       13 : 'enter'
     }
 
-    jsonData : any = data;
-    jsonDataLen = this.jsonData.length;
+    jsonData : any = [];
+    jsonDataLen = 0;
     imagePrevIndex = -1;
     imageCurrIndex = 0;
     imageNextIndex = 1;
@@ -70,18 +71,39 @@ export class KeytagmeComponent implements OnInit {
     timerInterval;
     showtxtFileData = [];
     txtFileData = [];
+    csvData = [];
     toggleText : String = 'show';
+    dummyData : any = [
+      {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
+      {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
+      {"imageUrl" : "./assets/3.jpg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
+      // {"imageUrl" : "./assets/4.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false}
+  ]
   // ------- variable declarations END----------
 
 
-  constructor(public htpclt:HttpClient) {
+  constructor(public htpclt:HttpClient, public cdref:ChangeDetectorRef, public ngzone:NgZone) {
+    this.readCsvData();
+   }
 
-    this.readtxtFile();
+   assignDataInit(myData){
+    this.jsonData = myData.length >0 ? myData : this.dummyData;
+    this.jsonDataLen = this.jsonData.length;
+    if(this.jsonData.length>0){
+      for(let i=0;i<this.jsonData.length;i++){
+        if(this.jsonData[i].keyTag.length == 0) {
+          // special cases for first image
+          if(i==0) break
 
-    this.startTimeInterval();
+          this.imagePrevIndex = i-1;
+          this.imageCurrIndex = i;
+          this.imageNextIndex = i+1;
+          break
+        }
+      }
 
-    
-
+      // if()
+    }
    }
 
    startTimeInterval(){
@@ -104,8 +126,32 @@ export class KeytagmeComponent implements OnInit {
               if(this.isMouseHoveredonNotes){
                 console.log(this.jsonData[this.imageCurrIndex]);
               } else {
-                this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
-                console.log(this.jsonData);
+                // let index = this.txtFileData.map((x)=>x.key).indexOf(this.alphaNumericKeys[value]);
+                let isexists = ""
+                for(let i=0;i<this.txtFileData.length;i++){
+                  if(this.txtFileData[i][this.alphaNumericKeys[value]]) {
+                    this.ngzone.run( () => {
+                    // this.cdref.detectChanges();
+                    setTimeout(()=>{
+                      this.jsonData[this.imageCurrIndex].keyTag.push(this.txtFileData[i][this.alphaNumericKeys[value]])
+                    },100)
+                    isexists = this.txtFileData[i][this.alphaNumericKeys[value]]
+                    })
+                    break
+                  }
+                }
+                if(!isexists){
+                  this.ngzone.run( () => {
+                  // this.cdref.detectChanges();
+                  setTimeout(()=>{
+                      this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
+                  })
+                  })
+                } 
+
+                  // console.log(this.jsonData);
+                // })
+
               }
             }
           })
@@ -222,6 +268,53 @@ export class KeytagmeComponent implements OnInit {
     saveAs(blob, fileName);
   }
 
-  
 
+  readCsvData () {
+    this.htpclt.get('./assets/sample.csv',{responseType:'text'})
+    .subscribe(data=>{
+
+      // ---------------------- 
+      let csvData = data;
+      let allTextLines = csvData.split(/\r\n|\n/);
+      let headers = allTextLines[0].split(',');
+      let lines = [];
+  
+      for ( let i = 0; i < allTextLines.length; i++) {
+          // split content based on comma
+          if(i==0) continue;
+          let data = allTextLines[i].split(',');
+          let tarr = [];
+          // if (data.length == headers.length) {
+              let aObj = {};
+              for ( let j = 0; j < headers.length; j++) {
+                  let removeExtraQuotes = data[j].replace(/"/g,'')
+                  if(headers[j]== 'keyTag'){
+                    if(removeExtraQuotes.length <=0) {
+                      aObj[headers[j].replace(/"/,'')] = []
+                    } else {
+                      aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'').split(';')
+                    }
+                  } else {
+                    aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'')
+                  }
+              }
+              // tarr.push(aObj);
+
+          // }
+          lines.push(aObj);
+
+      }
+      console.log(lines);
+      this.csvData = lines;
+      this.assignDataInit(this.csvData);
+      this.readtxtFile();
+      this.startTimeInterval();
+      // ----------------------
+
+    }, err => {
+      console.log("ERROR", err);
+    })
+  }
+
+  
 }
