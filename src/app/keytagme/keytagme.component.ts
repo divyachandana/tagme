@@ -108,7 +108,8 @@ export class KeytagmeComponent implements OnInit {
 
    startTimeInterval(){
     this.timerInterval = setInterval(()=>{
-      this.jsonData[this.imageCurrIndex].timeSpent +=1;
+      if(!this.jsonData[this.imageCurrIndex].timeSpent) this.jsonData[this.imageCurrIndex].timeSpent = 0
+      this.jsonData[this.imageCurrIndex].timeSpent += 1;
       // console.log(this.jsonData);
     },1000);
    }
@@ -264,7 +265,7 @@ export class KeytagmeComponent implements OnInit {
 
     var blob = new Blob([csvArray], {type: 'text/csv' })
     let d = new Date().toDateString();
-    let fileName = '' + d + new Date().toTimeString() + '.csv';
+    let fileName = 'sample.csv';
     saveAs(blob, fileName);
   }
 
@@ -287,15 +288,15 @@ export class KeytagmeComponent implements OnInit {
           // if (data.length == headers.length) {
               let aObj = {};
               for ( let j = 0; j < headers.length; j++) {
-                  let removeExtraQuotes = data[j].replace(/"/g,'')
+                  let removeExtraQuotes = data[j] ?  data[j].replace(/"/g,'') : data[j]
                   if(headers[j]== 'keyTag'){
-                    if(removeExtraQuotes.length <=0) {
+                    if(!removeExtraQuotes) {
                       aObj[headers[j].replace(/"/,'')] = []
                     } else {
                       aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'').split(';')
                     }
                   } else {
-                    aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'')
+                    aObj[headers[j].replace(/"/,'')] = data[j] ? data[j].replace(/"/g,'') : data[j]
                   }
               }
               // tarr.push(aObj);

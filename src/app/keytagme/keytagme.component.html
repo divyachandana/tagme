@@ -1,4 +1,4 @@
-<div class="center">
+<div class="center" *ngIf="jsonData.length>0">
 
     <mat-grid-list cols="3" rowHeight = "300px">
         <mat-grid-tile>
@@ -44,7 +44,7 @@
             </div>
         </mat-grid-tile>
         <mat-grid-tile>
-            <div *ngIf="imageNextIndex!=jsonDataLen" >
+            <div *ngIf="imageNextIndex!=jsonDataLen && jsonData.length>0" >
                 <p style="text-align: center;">{{jsonData[imageNextIndex].keyTag}}</p>
                 <img [src]=jsonData[imageNextIndex].imageUrl
                 style="height:150px;width:150px;padding:10px;">
@@ -54,7 +54,7 @@
 
         <mat-grid-tile></mat-grid-tile>
         <mat-grid-tile>
-            <textarea class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+            <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
             [(ngModel)]=jsonData[imageCurrIndex].notes 
             placeholder="Describe the image" style="text-align: left;" rows="12" cols="80"></textarea>
         </mat-grid-tile>
