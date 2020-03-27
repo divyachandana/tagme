@@ -2,6 +2,9 @@
 
     <mat-grid-list cols="3" rowHeight = "300px">
         <mat-grid-tile>
+            <!-- <mat-checkbox class="example-margin" [(ngModel)]="checked">Checked</mat-checkbox> -->
+           
+
             <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
    
             <div>
@@ -13,6 +16,8 @@
             </div>
         </mat-grid-tile>
         <mat-grid-tile>
+            <input type="checkbox" [(ngModel)]="checked">
+            <label for="autoscroll"> AutoScroll</label><br>
             <div>
                 <p style="text-align: center;">{{jsonData[imageCurrIndex].keyTag}}</p>
                 <!-- <textarea [(ngModel)]=jsonData[imageCurrIndex].keyTag></textarea> -->

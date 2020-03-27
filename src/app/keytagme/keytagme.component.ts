@@ -73,6 +73,7 @@ export class KeytagmeComponent implements OnInit {
     txtFileData = [];
     csvData = [];
     toggleText : String = 'show';
+    checked : boolean = true;
     dummyData : any = [
       {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
       {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
@@ -148,10 +149,12 @@ export class KeytagmeComponent implements OnInit {
                       this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
                   })
                   })
-                } 
+                }
+
 
                   // console.log(this.jsonData);
                 // })
+                if(this.checked)this.gotoNext();
 
               }
             }
