@@ -74,6 +74,7 @@ export class KeytagmeComponent implements OnInit {
     csvData = [];
     toggleText : String = 'show';
     checked : boolean = true;
+    allowMultiTags : boolean = true;
     dummyData : any = [
       {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
       {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
@@ -154,7 +155,11 @@ export class KeytagmeComponent implements OnInit {
 
                   // console.log(this.jsonData);
                 // })
-                if(this.checked)this.gotoNext();
+                if(this.checked){ 
+                  if(!this.jsonData[this.imageCurrIndex].multiTag){
+                    this.gotoNext();
+                  }                 
+                }
 
               }
             }
