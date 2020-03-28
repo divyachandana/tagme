@@ -135,9 +135,13 @@ export class KeytagmeComponent implements OnInit {
                   if(this.txtFileData[i][this.alphaNumericKeys[value]]) {
                     this.ngzone.run( () => {
                     // this.cdref.detectChanges();
-                    setTimeout(()=>{
+                    // setTimeout(()=>{
+                      if(!this.jsonData[this.imageCurrIndex].multiTag){
+                        this.jsonData[this.imageCurrIndex].keyTag = []
+                      }
                       this.jsonData[this.imageCurrIndex].keyTag.push(this.txtFileData[i][this.alphaNumericKeys[value]])
-                    },100)
+
+                    // },100)
                     isexists = this.txtFileData[i][this.alphaNumericKeys[value]]
                     })
                     break
@@ -146,9 +150,13 @@ export class KeytagmeComponent implements OnInit {
                 if(!isexists){
                   this.ngzone.run( () => {
                   // this.cdref.detectChanges();
-                  setTimeout(()=>{
-                      this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
-                  })
+                  // setTimeout(()=>{
+                    if(!this.jsonData[this.imageCurrIndex].multiTag){
+                      this.jsonData[this.imageCurrIndex].keyTag = []
+                    }
+                    this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
+
+                  // })
                   })
                 }
 
@@ -157,7 +165,8 @@ export class KeytagmeComponent implements OnInit {
                 // })
                 if(this.checked){ 
                   if(!this.jsonData[this.imageCurrIndex].multiTag){
-                    this.gotoNext();
+                    setTimeout(()=>{
+                    this.gotoNext();},100)
                   }                 
                 }
 
@@ -234,6 +243,17 @@ export class KeytagmeComponent implements OnInit {
 
   }
 
+
+  navigate(i,id){
+    this.imagePrevIndex = i<=0 ? -1 : i-1
+    this.imageNextIndex = i+1
+    this.imageCurrIndex = i;
+    // let el = document.getElementById(id);
+    // el.scrollIntoView({behavior: 'smooth'});
+    debugger
+    
+  }
+
   readtxtFile(){
     this.htpclt.get('./assets/tags.txt',{responseType:'text'})
     .subscribe(data=>{
@@ -257,6 +277,7 @@ export class KeytagmeComponent implements OnInit {
   toggle(){
     this.toggleText = this.toggleText == 'show' ? this.toggleText='hide' : this.toggleText='show';
   }
+
 
 
   downloadCSVFile(){

@@ -19,7 +19,7 @@
             <input type="checkbox" [(ngModel)]="checked">
             <label for="autoscroll"> AutoScroll</label><br> 
             <div></div>           
-            <input type="checkbox" [(ngModel)]="jsonData[imageCurrIndex].multiTag">
+            <input type="checkbox" [(ngModel)]="multiTag">
             <label for="multitags"> Allow Multi Tags</label><br>
             <div>
                 <p style="text-align: center;">{{jsonData[imageCurrIndex].keyTag}}</p>
@@ -34,7 +34,11 @@
             <!-- {{jsonData}}{{jsonData[imageCurrIndex].keyTag}} -->
         </mat-grid-tile>
         <mat-grid-tile>
-                    
+            <div style="max-height:250px;overflow-y:scroll;">
+             <div *ngFor="let s of jsonData;let i=index">
+                 <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'green':s.keyTag.length>0?'yellow':''}" style="cursor: pointer;">{{s.imageUrl}}</div>
+             </div>   
+            </div>    
         </mat-grid-tile>
 
         <mat-grid-tile>
@@ -48,7 +52,7 @@
         <mat-grid-tile>
 
             <div>
-                <img [src]=jsonData[imageCurrIndex].imageUrl style="height:500px;width:500px;">
+                <img [src]=jsonData[imageCurrIndex].imageUrl>
             </div>
         </mat-grid-tile>
         <mat-grid-tile>
