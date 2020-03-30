@@ -7,6 +7,10 @@
                     {{sd}}
                 </div>
             </div>
+            <br>
+            <input type="checkbox" [(ngModel)]="isclear">
+            <label for="isclear"> Clear All Data</label><br> 
+            <button mat-button color="accent" (click)="clearStorage()">Clear</button>            
     </div>
 
     <div>

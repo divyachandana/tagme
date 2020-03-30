@@ -75,6 +75,7 @@ export class KeytagmeComponent implements OnInit {
     toggleText : String = 'show';
     checked : boolean = true;
     allowMultiTags : boolean = true;
+    isclear : boolean = false;
     dummyData : any = [
       {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
       {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
@@ -85,7 +86,18 @@ export class KeytagmeComponent implements OnInit {
 
 
   constructor(public htpclt:HttpClient, public cdref:ChangeDetectorRef, public ngzone:NgZone) {
-    this.readCsvData();
+    let allData = localStorage.getItem("tagMeData");
+    if(allData){
+      let Data = JSON.parse(allData);
+      this.csvData = Data;
+      this.assignDataInit(this.csvData);
+      this.readtxtFile();
+      this.startTimeInterval();
+    } else {
+      this.readCsvData();
+    }
+    
+
    }
 
    assignDataInit(myData){
@@ -140,6 +152,7 @@ export class KeytagmeComponent implements OnInit {
                         this.jsonData[this.imageCurrIndex].keyTag = []
                       }
                       this.jsonData[this.imageCurrIndex].keyTag.push(this.txtFileData[i][this.alphaNumericKeys[value]])
+                      localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
 
                     // },100)
                     isexists = this.txtFileData[i][this.alphaNumericKeys[value]]
@@ -155,6 +168,8 @@ export class KeytagmeComponent implements OnInit {
                       this.jsonData[this.imageCurrIndex].keyTag = []
                     }
                     this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
+                    localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
+
 
                   // })
                   })
@@ -282,6 +297,13 @@ export class KeytagmeComponent implements OnInit {
 
   delete(i){
     this.jsonData[this.imageCurrIndex].keyTag.splice(i,1);
+  }
+
+  clearStorage(){
+    if(this.isclear) {
+      localStorage.removeItem('tagMeData');
+      location.reload();
+    }
   }
 
 
