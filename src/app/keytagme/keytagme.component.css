@@ -31,3 +31,47 @@ img{
   max-height: 100%;
   display: block; /* remove extra space below image */
 }
+
+
+/* -------------- new ------------ */
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-container > div {
+  /* background-color: #ffffff; */
+  width: 30%;
+  margin: 10px;
+  text-align: center;
+  /* line-height: 75px; */
+}
+
+.flex-container2 {
+  display: flex;
+  align-items: stretch;
+}
+
+.flex-container2 > div {
+  /* background-color: #ffffff; */
+  width: 100px;
+  margin: 10px;
+  text-align: center;
+  /* line-height: 75px; */
+}
+
+.horizontal {
+  display:block;
+ float:left;
+}
+
+.hori:after{
+  display: inline-block;
+  content: "\00d7"; /* This will render the 'X' */
+  margin-right: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+

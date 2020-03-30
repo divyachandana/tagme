@@ -1,89 +1,60 @@
-<div class="center" *ngIf="jsonData.length>0">
+<div *ngIf="jsonData.length>0" class="flex-container">
 
-    <mat-grid-list cols="3" rowHeight = "300px">
-        <mat-grid-tile>
-            <!-- <mat-checkbox class="example-margin" [(ngModel)]="checked">Checked</mat-checkbox> -->
-           
-
+    <div>
             <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
-   
-            <div>
                 <div *ngIf="toggleText=='show'">
-                    <div *ngFor="let sd of showtxtFileData">
-                        {{sd}}
-                    </div>
+                <div *ngFor="let sd of showtxtFileData">
+                    {{sd}}
                 </div>
             </div>
-        </mat-grid-tile>
-        <mat-grid-tile>
+    </div>
+
+    <div>
             <input type="checkbox" [(ngModel)]="checked">
             <label for="autoscroll"> AutoScroll</label><br> 
-            <div></div>           
             <input type="checkbox" [(ngModel)]="jsonData[imageCurrIndex].multiTag">
-            <label for="multitags"> Allow Multi Tags</label><br>
-            <div>
-                <p style="text-align: center;">{{jsonData[imageCurrIndex].keyTag}}</p>
-                <!-- <textarea [(ngModel)]=jsonData[imageCurrIndex].keyTag></textarea> -->
-            </div>
-            <!-- <div>
-                <p style="text-align: center;">{{jsonData[imageCurrIndex].keyTag}}</p>
-            </div> -->
-            <!-- <div *ngIf="jsonData.length>0">
-                <div *ngFor="let d in jsonData">{{d.keyTag}}</div>
-            </div> -->
-            <!-- {{jsonData}}{{jsonData[imageCurrIndex].keyTag}} -->
-        </mat-grid-tile>
-        <mat-grid-tile>
-            <div style="max-height:250px;overflow-y:scroll;">
-             <div *ngFor="let s of jsonData;let i=index">
-                 <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'green':s.keyTag.length>0?'yellow':''}" style="cursor: pointer;">{{s.imageUrl}}</div>
-             </div>   
-            </div>    
-        </mat-grid-tile>
+            <label for="multitags"> Allow Multi Tags</label><br>            
+    </div>
 
-        <mat-grid-tile>
-            <img src="./assets/left-arrow.png" style="height:100px;width:100px;vertical-align: top;">
+    <div>
+            <div style="max-height:250px;overflow-y:scroll;">
+                <div *ngFor="let s of jsonData;let i=index">
+                    <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'green':s.keyTag.length>0?'yellow':''}" style="cursor: pointer;">{{(s.imageUrl+'').replace('./assets/Image/','')}}</div>
+                </div>   
+            </div>    
+    </div>
+</div>
+
+<div class="flex-container2">
+
+    <div style="flex-grow: 1">
             <div *ngIf="imagePrevIndex!=-1">
                 <p style="text-align: center;">{{jsonData[imagePrevIndex].keyTag}}</p>
-                <img  [src]=jsonData[imagePrevIndex].imageUrl
-                style="height:150px;width:150px;padding:10px;">
+                <img  [src]=jsonData[imagePrevIndex].imageUrl>
             </div>
-        </mat-grid-tile>
-        <mat-grid-tile>
+    </div>
 
-            <div>
-                <img [src]=jsonData[imageCurrIndex].imageUrl>
-            </div>
-        </mat-grid-tile>
-        <mat-grid-tile>
+    <div style="flex-grow: 8">
+            <p style="text-align: center;" class="horizontal" *ngFor="let s of jsonData[imageCurrIndex].keyTag;let i=index">{{s}} <span class="hori" (click)=delete(i)></span></p>
+            <img [src]=jsonData[imageCurrIndex].imageUrl>
+    </div>
+
+    <div style="flex-grow: 1">
             <div *ngIf="imageNextIndex!=jsonDataLen && jsonData.length>0" >
-                <p style="text-align: center;">{{jsonData[imageNextIndex].keyTag}}</p>
-                <img [src]=jsonData[imageNextIndex].imageUrl
-                style="height:150px;width:150px;padding:10px;">
+                <p style="text-align: center;">{{jsonData[imageNextIndex].keyTag}} </p>
+                <img [src]=jsonData[imageNextIndex].imageUrl>
             </div>   
-            <img src="./assets/right-arrow.png" style="height:100px;width:100px;vertical-align: top;">
-        </mat-grid-tile>
-
-        <mat-grid-tile></mat-grid-tile>
-        <mat-grid-tile>
-            <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
-            [(ngModel)]=jsonData[imageCurrIndex].notes 
-            placeholder="Describe the image" style="text-align: left;" rows="12" cols="80"></textarea>
-        </mat-grid-tile>
-        <mat-grid-tile></mat-grid-tile>
-
-        <mat-grid-tile></mat-grid-tile>
-        <mat-grid-tile></mat-grid-tile>
-        <mat-grid-tile></mat-grid-tile>
-    </mat-grid-list>
-
-    <!-- <p style="text-align: center;font-size: medium;color: brown;font-weight: 600;">{{jsonData[imageCurrIndex].timeSpent}}</p> -->
-
-
-
-    
-    
-
-  
-
+    </div>    
 </div>
+
+<div class="flex-container">
+    <div></div>
+    <div>
+        <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+            [(ngModel)]=jsonData[imageCurrIndex].notes 
+            placeholder="Describe the image" style="text-align: left;" rows="12" cols="50"></textarea>
+    </div>
+    <div></div>
+</div>
+
+

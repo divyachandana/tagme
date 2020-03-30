@@ -166,8 +166,7 @@ export class KeytagmeComponent implements OnInit {
                 if(this.checked){ 
                   // debugger
                   if(this.jsonData[this.imageCurrIndex].multiTag){                    
-                  } else {
-                    
+                  } else {                    
                     setTimeout(()=>{
                       this.gotoNext();},100)
                   }                 
@@ -279,6 +278,10 @@ export class KeytagmeComponent implements OnInit {
 
   toggle(){
     this.toggleText = this.toggleText == 'show' ? this.toggleText='hide' : this.toggleText='show';
+  }
+
+  delete(i){
+    this.jsonData[this.imageCurrIndex].keyTag.splice(i,1);
   }
 
 
