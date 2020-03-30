@@ -164,9 +164,12 @@ export class KeytagmeComponent implements OnInit {
                   // console.log(this.jsonData);
                 // })
                 if(this.checked){ 
-                  if(!this.jsonData[this.imageCurrIndex].multiTag){
+                  // debugger
+                  if(this.jsonData[this.imageCurrIndex].multiTag){                    
+                  } else {
+                    
                     setTimeout(()=>{
-                    this.gotoNext();},100)
+                      this.gotoNext();},100)
                   }                 
                 }
 
@@ -250,7 +253,7 @@ export class KeytagmeComponent implements OnInit {
     this.imageCurrIndex = i;
     // let el = document.getElementById(id);
     // el.scrollIntoView({behavior: 'smooth'});
-    debugger
+    // debugger
     
   }
 
