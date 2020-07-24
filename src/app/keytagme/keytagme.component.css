@@ -57,6 +57,7 @@ img{
   /* background-color: #ffffff; */
   width: 100px;
   margin: 10px;
+  height: 500px;
   text-align: center;
   /* line-height: 75px; */
 }
@@ -73,5 +74,9 @@ img{
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.top-space{
+  margin-top: 10px;
 }
 

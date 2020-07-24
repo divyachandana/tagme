@@ -125,5 +125,8 @@
       }
     }
   },
-  "defaultProject": "tagme"
+  "defaultProject": "tagme",
+  "cli": {
+    "analytics": false
+  }
 }

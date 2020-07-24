@@ -3,12 +3,17 @@ import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
+import { UploadService } from '../services/upload.service';
+import S3 from 'aws-sdk/clients/s3';
+
 @Component({
   selector: 'app-keytagme',
   templateUrl: './keytagme.component.html',
   styleUrls: ['./keytagme.component.css']
 })
 export class KeytagmeComponent implements OnInit {
+  selectedFiles: any;
+
   // ------- variable declarations START ----------
     alphaNumericKeys : any = {
       48 : 0,
@@ -76,16 +81,16 @@ export class KeytagmeComponent implements OnInit {
     checked : boolean = true;
     allowMultiTags : boolean = true;
     isclear : boolean = false;
-    dummyData : any = [
-      {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
-      {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
-      {"imageUrl" : "./assets/3.jpg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
-      // {"imageUrl" : "./assets/4.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false}
-  ]
+  //   dummyData : any = [
+  //     {"imageUrl" : "./assets/1.jpg", "keyTag":[2,3,4], "notes":"" ,"timeSpent":0,"multiTag":false},
+  //     {"imageUrl" : "./assets/2.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
+  //     {"imageUrl" : "./assets/3.jpg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false},
+  //     // {"imageUrl" : "./assets/4.jpeg", "keyTag":[], "notes":"" ,"timeSpent":0,"multiTag":false}
+  // ]
   // ------- variable declarations END----------
 
 
-  constructor(public htpclt:HttpClient, public cdref:ChangeDetectorRef, public ngzone:NgZone) {
+  constructor(public htpclt:HttpClient, public cdref:ChangeDetectorRef, public ngzone:NgZone,private uploadService: UploadService) {
     let allData = localStorage.getItem("tagMeData");
     if(allData){
       let Data = JSON.parse(allData);
@@ -94,14 +99,18 @@ export class KeytagmeComponent implements OnInit {
       this.readtxtFile();
       this.startTimeInterval();
     } else {
-      this.readCsvData();
+      console.log("Else")
+      // this.readCsvData();
+      this.getFiles()
     }
+
+    // console.log()
     
 
    }
 
    assignDataInit(myData){
-    this.jsonData = myData.length >0 ? myData : this.dummyData;
+    this.jsonData = myData.length >0 ? myData : [];
     this.jsonDataLen = this.jsonData.length;
     if(this.jsonData.length>0){
       for(let i=0;i<this.jsonData.length;i++){
@@ -121,11 +130,16 @@ export class KeytagmeComponent implements OnInit {
    }
 
    startTimeInterval(){
+     if(this.jsonData.length >0){
+
+  
+
     this.timerInterval = setInterval(()=>{
       if(!this.jsonData[this.imageCurrIndex].timeSpent) this.jsonData[this.imageCurrIndex].timeSpent = 0
       this.jsonData[this.imageCurrIndex].timeSpent += 1;
       // console.log(this.jsonData);
     },1000);
+  }
    }
 
    stopTimeInterval(){
@@ -327,52 +341,152 @@ export class KeytagmeComponent implements OnInit {
   }
 
 
-  readCsvData () {
-    this.htpclt.get('./assets/sample.csv',{responseType:'text'})
-    .subscribe(data=>{
+  // readCsvData () {
+  //   this.htpclt.get('./assets/sample.csv',{responseType:'text'})
+  //   .subscribe(data=>{
 
-      // ---------------------- 
-      let csvData = data;
-      let allTextLines = csvData.split(/\r\n|\n/);
-      let headers = allTextLines[0].split(',');
-      let lines = [];
+  //     // ---------------------- 
+  //     let csvData = data;
+  //     let allTextLines = csvData.split(/\r\n|\n/);
+  //     let headers = allTextLines[0].split(',');
+  //     let lines = [];
   
-      for ( let i = 0; i < allTextLines.length; i++) {
-          // split content based on comma
-          if(i==0) continue;
-          let data = allTextLines[i].split(',');
-          let tarr = [];
-          // if (data.length == headers.length) {
-              let aObj = {};
-              for ( let j = 0; j < headers.length; j++) {
-                  let removeExtraQuotes = data[j] ?  data[j].replace(/"/g,'') : data[j]
-                  if(headers[j]== 'keyTag'){
-                    if(!removeExtraQuotes) {
-                      aObj[headers[j].replace(/"/,'')] = []
-                    } else {
-                      aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'').split(';')
-                    }
-                  } else {
-                    aObj[headers[j].replace(/"/,'')] = data[j] ? data[j].replace(/"/g,'') : data[j]
-                  }
-              }
-              // tarr.push(aObj);
+  //     for ( let i = 0; i < allTextLines.length; i++) {
+  //         // split content based on comma
+  //         if(i==0) continue;
+  //         let data = allTextLines[i].split(',');
+  //         let tarr = [];
+  //         // if (data.length == headers.length) {
+  //             let aObj = {};
+  //             for ( let j = 0; j < headers.length; j++) {
+  //                 let removeExtraQuotes = data[j] ?  data[j].replace(/"/g,'') : data[j]
+  //                 if(headers[j]== 'keyTag'){
+  //                   if(!removeExtraQuotes) {
+  //                     aObj[headers[j].replace(/"/,'')] = []
+  //                   } else {
+  //                     aObj[headers[j].replace(/"/,'')] = data[j].replace(/"/g,'').split(';')
+  //                   }
+  //                 } else {
+  //                   aObj[headers[j].replace(/"/,'')] = data[j] ? data[j].replace(/"/g,'') : data[j]
+  //                 }
+  //             }
+  //             // tarr.push(aObj);
 
+  //         // }
+  //         lines.push(aObj);
+
+  //     }
+  //     console.log(lines);
+  //     this.csvData = lines;
+  //     this.assignDataInit(this.csvData);
+  //     this.readtxtFile();
+  //     this.startTimeInterval();
+  //     // ----------------------
+
+  //   }, err => {
+  //     console.log("ERROR", err);
+  //   })
+  // }
+
+
+
+  upload() {
+    // const file = this.selectedFiles.item(0);
+
+
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      this.uploadService.uploadFile( this.selectedFiles[i]);
+      let d_obj = {}
+            let f_name = "https://s3.amazonaws.com/tagmeimages/"+ this.selectedFiles[i].name
+            d_obj['imageUrl'] = f_name
+            d_obj['keyTag'] = []
+            d_obj['notes'] = ""
+            d_obj['timeSpent'] = 0
+            d_obj['multiTag'] = false
+            this.csvData.push(d_obj)
+    }
+    this.jsonData = this.csvData
+    this.jsonDataLen = this.jsonData.length;
+    localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
+
+
+    // this.selectedFiles = [];
+    }
+    
+    selectFile(event) {
+    this.selectedFiles = event.target.files;
+    }
+
+
+
+    getFiles() {
+      let that = this
+      let imageList = []
+      console.log(imageList)
+      const bucket = new S3(
+          {
+              accessKeyId: 'AKIAW5ACMRY23SSP2H66',
+              secretAccessKey: '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',
+              region: 'us-east-1'
+          }
+          );
+      const params = {
+          Bucket: 'tagmeimages',
+          // Prefix: this.FOLDER
+      };
+   
+      bucket.listObjects(params, function (err, data) {
+        if (err) {
+          console.log('There was an error getting your files: ' + err);
+          return;
+        }
+   
+        console.log('Successfully get files.', data);
+   
+        const fileDatas = data.Contents;
+        let lines = []
+
+        fileDatas.forEach(function (file) {
+          // for ( let i = 0; i < imageList.length; i++) {
+            let d_obj = {}
+            let f_name = "https://s3.amazonaws.com/tagmeimages/"+ file.Key
+            d_obj['imageUrl'] = f_name
+            d_obj['keyTag'] = []
+            d_obj['notes'] = ""
+            d_obj['timeSpent'] = 0
+            d_obj['multiTag'] = false
+    
+            lines.push(d_obj);
+    
           // }
-          lines.push(aObj);
+    
 
-      }
-      console.log(lines);
-      this.csvData = lines;
-      this.assignDataInit(this.csvData);
-      this.readtxtFile();
-      this.startTimeInterval();
-      // ----------------------
+        });
+        // imageList = data.Contents
 
-    }, err => {
-      console.log("ERROR", err);
-    })
-  }
+        console.log(lines);
+        that.csvData = lines;
+        that.assignDataInit(lines)
+        that.readtxtFile();
+        that.startTimeInterval();
+        
+        // let f_name = ""
+        // fileDatas.forEach(function (file) {
+        //   console.log("-----",file)
+        //   f_name = "https://s3.amazonaws.com/tagemeimages/"+ file.Key
+        //   imageList.push(f_name)
+        //   // fileUploads.push(new FileUpload(file.Key, 'https://s3.amazonaws.com/' + params.Bucket + '/' + file.Key));
+        // });
+      });
+
+      // this.assignDataInit(this.csvData);
+      
+   
+      // imageUrl,keyTag,notes,timeSpent,multiTag
+
+      // return imageList
+      // return Observable.of(fileUploads);
+    }
 
   
 }
