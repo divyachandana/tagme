@@ -10,11 +10,11 @@
 
             <div class="top-space">
                 <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
-                    <div *ngIf="toggleText=='show'">
-                    <div *ngFor="let sd of showtxtFileData" style="float: left; margin-right: 30px;">
-                        {{sd}}
+                    <div *ngIf="toggleText=='show'" style="margin-bottom: 10px!important;">
+                        <div *ngFor="let sd of showtxtFileData">
+                            {{sd}}
+                        </div>
                     </div>
-                </div>
                 <br>
                 <input type="checkbox" [(ngModel)]="isclear">
                 <label for="isclear"> Clear All Data</label><br> 

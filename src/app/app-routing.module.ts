@@ -4,8 +4,8 @@ import { KeytagmeComponent } from './keytagme/keytagme.component';
 
 
 export const routes: Routes = [
-  { path: "", redirectTo: "/imgtag", pathMatch: "full" },
-  { path: "imgtag", component: KeytagmeComponent },
+  // { path: "", redirectTo: "/imgtag", pathMatch: "full" },
+  { path: "", component: KeytagmeComponent },
 ];
 
 // @NgModule({
