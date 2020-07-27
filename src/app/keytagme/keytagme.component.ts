@@ -425,8 +425,8 @@ export class KeytagmeComponent implements OnInit {
       console.log(imageList)
       const bucket = new S3(
           {
-              accessKeyId: 'XXXXXXXX',
-              secretAccessKey: 'XXXXXXXx',
+              accessKeyId: 'XXX',
+              secretAccessKey: 'XXX',
               region: 'us-east-1'
           }
           );

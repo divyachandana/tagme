@@ -1,17 +1,17 @@
 
-<div *ngIf="jsonData.length>0" class="flex-container2">
+<div *ngIf="jsonData.length>0" class="flex-container">
 
-    <div style="flex-grow: 1">
-            <div *ngIf="imagePrevIndex!=-1" class="top-space">
-                <p style="text-align: center;">{{jsonData[imagePrevIndex].keyTag}}</p>
+    <div style="flex-grow: 1"  style="width: 20%;">
+            <div *ngIf="imagePrevIndex!=-1">
+                <p>{{jsonData[imagePrevIndex].keyTag}}</p>
                 <img  [src]=jsonData[imagePrevIndex].imageUrl>
                 <hr>
             </div>
 
-            <div class="top-space">
+            <div>
                 <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
-                    <div *ngIf="toggleText=='show'" style="margin-bottom: 10px!important;">
-                        <div *ngFor="let sd of showtxtFileData">
+                    <div *ngIf="toggleText=='show'">
+                        <div *ngFor="let sd of showtxtFileData" style="text-transform: capitalize;">
                             {{sd}}
                         </div>
                     </div>
@@ -22,24 +22,26 @@
                 <hr>        
              </div>
 
-             <label class="btn btn-default top-space">
-                <button mat-button class="top-space" color="accent" (click)="downloadCSVFile()">Download</button>
+             <label class="btn btn-default">
+                <button mat-button color="accent" (click)="downloadCSVFile()">Download</button>
               </label>
     </div>
 
-    <div style="flex-grow: 6">
-            <p style="text-align: center;" class="horizontal" *ngFor="let s of jsonData[imageCurrIndex].keyTag;let i=index">{{s}} <span class="hori" (click)=delete(i)></span></p>
-            <img [src]=jsonData[imageCurrIndex].imageUrl>
+    <div style="flex-grow: 8"  style="width: 60%;" >
+            <p class="horizontal" *ngFor="let s of jsonData[imageCurrIndex].keyTag;let i=index">{{s}} 
+                <span class="hori" (click)=delete(i)></span>
+            </p>
+            <img class="center" [src]=jsonData[imageCurrIndex].imageUrl>
     </div>
 
-    <div style="flex-grow: 3">
-            <div *ngIf="imageNextIndex!=jsonDataLen && jsonData.length>0" class="top-space">
-                <p style="text-align: center;">{{jsonData[imageNextIndex].keyTag}} </p>
+    <div style="flex-grow: 1"  style="width: 20%;">
+            <div *ngIf="imageNextIndex!=jsonDataLen && jsonData.length>0">
+                <p>{{jsonData[imageNextIndex].keyTag}} </p>
                 <img [src]=jsonData[imageNextIndex].imageUrl>
                 <hr>
             </div> 
 
-            <div class="top-space">
+            <div>
                 <input type="checkbox" [(ngModel)]="checked">
                 <label for="autoscroll"> AutoScroll</label><br> 
                 <input type="checkbox" [(ngModel)]="jsonData[imageCurrIndex].multiTag">
@@ -48,39 +50,42 @@
                 <br>            
             </div>
 
-            <div class="top-space">
-                <div style="max-height:250px;overflow-y:scroll;">
-                    <div *ngFor="let s of jsonData;let i=index">
-                        <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':s.keyTag.length>0?'#87CEFA':''}" style="cursor: pointer;">{{(s.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}</div>
-                    </div>   
-                </div>    
-            </div>
+            <!-- <div> -->
+  
+            <!-- </div> -->
               
     </div>    
 </div>
-
-<div *ngIf="jsonData.length>0" class="flex-container">
-    <div></div>
-    <div>
-        <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
-            [(ngModel)]=jsonData[imageCurrIndex].notes 
-            placeholder="Describe the image" style="text-align: left;" rows="12" cols="50"></textarea>
-    </div>
-    <div></div>
-</div>
-
+<hr>
 <div class="flex-container">
-    <div>
-        
-    </div>
-    <div>
-        <hr>
+    <div style="flex-grow: 1">
         <label class="btn btn-default">
             <input type="file" (change)="selectFile($event)" multiple="multiple">
         </label>  
         <button class="btn btn-success" [disabled]="!selectedFiles" (click)="upload()">Upload</button>
     </div>
-    <div></div>
+    <div style="flex-grow: 4">
+        <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+            [(ngModel)]=jsonData[imageCurrIndex].notes 
+            placeholder="Describe the image" rows="12" cols="50"></textarea>
+    </div>
+    <div style="flex-grow: 5">
+        <div style="max-height:250px;overflow-y:scroll;">
+            <div *ngFor="let s of jsonData;let i=index">
+                <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':s.keyTag.length>0?'#87CEFA':''}" style="cursor: pointer;">{{(s.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}</div>
+            </div>   
+        </div>  
+    </div>
 </div>
+
+<!-- <div class="flex-container">
+    <div>
+        
+    </div>
+    <div>
+       
+    </div>
+    <div></div>
+</div> -->
 
 

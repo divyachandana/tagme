@@ -1,70 +1,26 @@
-.center {
-    margin: auto;
-    width: 82%;
-    /* border: 0.5px solid grey; */
-    padding: 10px;
-  }
-
-  .frame {
-    height: 100px;      /* equals max image height */
-    width: 100px;
-    border: 1px solid red;
-    white-space: nowrap;
-    
-    text-align: center; margin: 1em 0;
+.flex-container {
+  display: flex;
+  align-items: stretch;
+  background-color: #f1f1f1;
 }
 
-  .helper {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-}
-
-.txt-area-center {
-  display: block;
-    margin-left: auto;
-    margin-right: auto;
+.flex-container > div {
+  margin: 10px;
+  text-align: left;
+  height: 50%;
 }
 
 img{
   max-width: 100%;
   max-height: 100%;
-  display: block; /* remove extra space below image */
-}
-
-
-/* -------------- new ------------ */
-
-.flex-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.flex-container > div {
-  /* background-color: #ffffff; */
-  width: 30%;
-  margin: 10px;
-  text-align: center;
-  /* line-height: 75px; */
-}
-
-.flex-container2 {
-  display: flex;
-  align-items: stretch;
-}
-
-.flex-container2 > div {
-  /* background-color: #ffffff; */
-  width: 100px;
-  margin: 10px;
-  height: 500px;
-  text-align: center;
-  /* line-height: 75px; */
+  display: block;
 }
 
 .horizontal {
   display:block;
- float:left;
+  float:left;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hori:after{
@@ -76,7 +32,15 @@ img{
   cursor: pointer;
 }
 
-.top-space{
-  margin-top: 10px;
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  height: 500px;
 }
+
+
+
 
