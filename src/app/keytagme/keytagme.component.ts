@@ -5,7 +5,20 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
 import { UploadService } from '../services/upload.service';
 import S3 from 'aws-sdk/clients/s3';
+// import {AngularFireModule} from 'angularfire2';
+// for auth    
+// import {AngularFireAuthModule} from 'angularfire2/auth';
+// for database
+import { AngularFireDatabase } from '@angular/fire/database';
 
+import {AngularFireList} from 'angularfire2/database';
+import { Observable, pipe } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+
+// class myTags {
+//   constructor(public title) { }
+// }
 @Component({
   selector: 'app-keytagme',
   templateUrl: './keytagme.component.html',
@@ -66,7 +79,6 @@ export class KeytagmeComponent implements OnInit {
       13 : 'enter'
     }
 
-    jsonData : any = [];
     jsonDataLen = 0;
     imagePrevIndex = -1;
     imageCurrIndex = 0;
@@ -76,7 +88,6 @@ export class KeytagmeComponent implements OnInit {
     timerInterval;
     showtxtFileData = [];
     txtFileData = [];
-    csvData = [];
     toggleText : String = 'show';
     checked : boolean = true;
     allowMultiTags : boolean = true;
@@ -89,56 +100,105 @@ export class KeytagmeComponent implements OnInit {
   // ]
   // ------- variable declarations END----------
 
+  tags: any = [];
+  itemsRef: AngularFireList<any>;
 
-  constructor(public htpclt:HttpClient, public cdref:ChangeDetectorRef, public ngzone:NgZone,private uploadService: UploadService) {
-    let allData = localStorage.getItem("tagMeData");
-    if(allData){
-      let Data = JSON.parse(allData);
-      this.csvData = Data;
-      this.assignDataInit(this.csvData);
-      this.readtxtFile();
-      this.startTimeInterval();
-    } else {
-      console.log("Else")
-      // this.readCsvData();
-      this.getFiles()
-    }
+  courses$: Observable<any[]>;
 
-    // console.log()
-    
+  constructor(public htpclt:HttpClient, 
+    public cdref:ChangeDetectorRef, 
+    public ngzone:NgZone,
+    private uploadService: UploadService,
+    db: AngularFireDatabase) 
+    {
+      this.itemsRef = db.list('tags');
+      this.courses$ = this.itemsRef.snapshotChanges()
+      .pipe(map(changes => {
+          return changes.map(c => ({ key: c.payload.key, ...c.payload.val() 
+        }));
+      }));
+
+      let that  = this
+      this.courses$.subscribe(data=>{ 
+        data.forEach((item) => {
+          if(item['keyTagStr'].length >0){
+            item['keyTag'] = item['keyTagStr'].split(';')
+          } else {
+            item['keyTag'] = []
+          }
+        })
+        this.tags = data;
+        // console.log(this.tags)
+        that.jsonDataLen = data.length
+        that.assignDataInit();
+        that.readtxtFile();
+        that.startTimeInterval();
+      })
+// debugger
+      
+
 
    }
 
-   assignDataInit(myData){
-    this.jsonData = myData.length >0 ? myData : [];
-    this.jsonDataLen = this.jsonData.length;
-    if(this.jsonData.length>0){
-      for(let i=0;i<this.jsonData.length;i++){
-        if(this.jsonData[i].keyTag.length == 0) {
-          // special cases for first image
-          if(i==0) break
 
-          this.imagePrevIndex = i-1;
-          this.imageCurrIndex = i;
-          this.imageNextIndex = i+1;
-          break
-        }
-      }
+addItem(data) {
+  this.itemsRef.push(data);
+}
 
-      // if()
+updateItem(key: string, dataObj) {
+  this.itemsRef.update(key, dataObj);
+}
+
+deleteItem(key: string) {
+  this.itemsRef.remove(key);
+}
+
+deleteEverything() {
+  this.itemsRef.remove();
+}
+
+assignDataInit(){
+    // this.jsonData = myData.length >0 ? myData : [];
+    // this.jsonDataLen = this.jsonData.length;
+    // this.getTagsLen()
+    // let that = this;
+    if(this.jsonDataLen>0){
+      // this.tags.subscribe(result =>{
+        // debugger
+          for(let i=0;i<this.jsonDataLen;i++){
+            if(this.tags[i].keyTag.length == 0) {
+              // special cases for first image
+              if(i==0) break
+    
+              this.imagePrevIndex = i-1;
+              this.imageCurrIndex = i;
+              this.imageNextIndex = i+1;
+              break
+            }
+          }
+
+      // })
+
+
     }
+   }
+
+   getTagsLen(){
+     this.jsonDataLen = this.tags.length;
    }
 
    startTimeInterval(){
-     if(this.jsonData.length >0){
-
-  
-
-    this.timerInterval = setInterval(()=>{
-      if(!this.jsonData[this.imageCurrIndex].timeSpent) this.jsonData[this.imageCurrIndex].timeSpent = 0
-      this.jsonData[this.imageCurrIndex].timeSpent += 1;
+     if(this.jsonDataLen >0){
+      this.timerInterval = setInterval(()=>{
+      // if(this.tags[this.imageCurrIndex].timeSpent <=0) this.tags[this.imageCurrIndex].timeSpent = 0
+      this.tags[this.imageCurrIndex].timeSpent += 10;
+      let k = this.tags[this.imageCurrIndex].key;
+      let obj = {timeSpent : this.tags[this.imageCurrIndex].timeSpent}
+      this.updateItem(k,obj)
+      // let currKey = this.tags[this.imageCurrIndex].key;
+      // this.tags[]
       // console.log(this.jsonData);
-    },1000);
+    },10000);
   }
    }
 
@@ -151,9 +211,8 @@ export class KeytagmeComponent implements OnInit {
 
           Object.keys(this.alphaNumericKeys).forEach((value)=>{
             if(parseInt(value) === event.keyCode){
-              // alert("You clicked :: " + event.keyCode + ':' + this.alphaNumericKeys[value]);
               if(this.isMouseHoveredonNotes){
-                console.log(this.jsonData[this.imageCurrIndex]);
+                console.log(this.tags[this.imageCurrIndex]);
               } else {
                 // let index = this.txtFileData.map((x)=>x.key).indexOf(this.alphaNumericKeys[value]);
                 let isexists = ""
@@ -162,11 +221,17 @@ export class KeytagmeComponent implements OnInit {
                     this.ngzone.run( () => {
                     // this.cdref.detectChanges();
                     // setTimeout(()=>{
-                      if(!this.jsonData[this.imageCurrIndex].multiTag){
-                        this.jsonData[this.imageCurrIndex].keyTag = []
+                      if(!this.tags[this.imageCurrIndex].multiTag){
+                        this.tags[this.imageCurrIndex].keyTag = []
+                        this.tags[this.imageCurrIndex].keyTagStr = ""
+                        let obj = {keyTagStr: ""}
+                        this.updateItem(this.tags[this.imageCurrIndex].key,obj)
                       }
-                      this.jsonData[this.imageCurrIndex].keyTag.push(this.txtFileData[i][this.alphaNumericKeys[value]])
-                      localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
+                      this.tags[this.imageCurrIndex].keyTag.push(this.txtFileData[i][this.alphaNumericKeys[value]])
+                      this.tags[this.imageCurrIndex].keyTagStr = this.tags[this.imageCurrIndex].keyTag.join(';')
+                      let obj = {keyTagStr: this.tags[this.imageCurrIndex].keyTagStr}
+                      this.updateItem(this.tags[this.imageCurrIndex].key,obj)
+                      // localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
 
                     // },100)
                     isexists = this.txtFileData[i][this.alphaNumericKeys[value]]
@@ -178,11 +243,17 @@ export class KeytagmeComponent implements OnInit {
                   this.ngzone.run( () => {
                   // this.cdref.detectChanges();
                   // setTimeout(()=>{
-                    if(!this.jsonData[this.imageCurrIndex].multiTag){
-                      this.jsonData[this.imageCurrIndex].keyTag = []
+                    if(!this.tags[this.imageCurrIndex].multiTag){
+                      this.tags[this.imageCurrIndex].keyTag = []
+                      this.tags[this.imageCurrIndex].keyTagStr = ""
+                      let obj = {keyTagStr: ""}
+                      this.updateItem(this.tags[this.imageCurrIndex].key,obj)
                     }
-                    this.jsonData[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
-                    localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
+                    this.tags[this.imageCurrIndex].keyTag.push(this.alphaNumericKeys[value]);
+                    this.tags[this.imageCurrIndex].keyTagStr = this.tags[this.imageCurrIndex].keyTag.join(';')
+                    let obj = {keyTagStr: this.tags[this.imageCurrIndex].keyTagStr}
+                    this.updateItem(this.tags[this.imageCurrIndex].key,obj)
+                    // localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
 
 
                   // })
@@ -194,7 +265,7 @@ export class KeytagmeComponent implements OnInit {
                 // })
                 if(this.checked){ 
                   // debugger
-                  if(this.jsonData[this.imageCurrIndex].multiTag){                    
+                  if(this.tags[this.imageCurrIndex].multiTag){                    
                   } else {                    
                     setTimeout(()=>{
                       this.gotoNext();},100)
@@ -220,7 +291,7 @@ export class KeytagmeComponent implements OnInit {
           Object.keys(this.enterKey).forEach((value)=>{
             if(parseInt(value) === event.keyCode){
               if(this.isMouseHoveredonNotes){
-                console.log(this.jsonData[this.imageCurrIndex]);
+                // console.log(this.jsonData[this.imageCurrIndex]);
               } else {
                 this.downloadCSVFile();
                 // alert("You clicked :: " + event.keyCode + ':' + this.enterKey[value]);
@@ -238,94 +309,75 @@ export class KeytagmeComponent implements OnInit {
   mouseLeave(e){
     this.isMouseHoveredonNotes = false;
     // console.log('leave', e);
+    let obj = {notes: this.tags[this.imageCurrIndex].notes}
+    this.updateItem(this.tags[this.imageCurrIndex].key,obj)
 
   }
 
-
-  ngOnInit() {
-
-  }
+  ngOnInit() {}
 
   gotoNext(){
+    // this.updateTime();
 
-    if(this.imageCurrIndex == this.jsonData.length-1){
-      // this.stopTimeInterval();
+    if(this.imageCurrIndex == this.jsonDataLen-1){
       alert("Hurray! you have finished");
-      // this.imagePrevIndex = -1;
-      // this.imageCurrIndex = 0;
-      // this.imageNextIndex = 1;
     } else {
       this.imagePrevIndex = this.imageCurrIndex;
       this.imageCurrIndex++;
       this.imageNextIndex = this.imageCurrIndex + 1;
     }
-
   }
 
   gotoPrev(){
+    // this.updateTime();
     if(this.imageCurrIndex == 0){
       alert("Click Next");
     } else {
       this.imageNextIndex = this.imageCurrIndex;
       this.imageCurrIndex--;
       this.imagePrevIndex = this.imageCurrIndex - 1;
-
     }
-
   }
-
 
   navigate(i,id){
     this.imagePrevIndex = i<=0 ? -1 : i-1
     this.imageNextIndex = i+1
     this.imageCurrIndex = i;
-    // let el = document.getElementById(id);
-    // el.scrollIntoView({behavior: 'smooth'});
-    // debugger
-    
   }
 
-  readtxtFile(){
-    this.htpclt.get('./assets/tags.txt',{responseType:'text'})
-    .subscribe(data=>{
-      console.log(typeof(data));
-      let fdata = data.split('\n');
-      this.showtxtFileData = fdata
-      console.log(fdata);
-      this.txtFileData = [];
-      fdata.forEach(ele=>{
-        let fele = ele.split(':')
-        let o = {};
-        o[fele[0].trim()] = fele[1].trim();
-        this.txtFileData.push(o);
-      })
-      console.log(this.txtFileData);
-    }, err => {
-      console.log("ERROR", err);
-    })
-  }
+  // updateTime(){
+  //   let k = this.tags[this.imageCurrIndex].key;
+  //   let obj = {timeSpent : this.tags[this.imageCurrIndex].timeSpent}
+  //   this.updateItem(k,obj)
+  // }
 
   toggle(){
     this.toggleText = this.toggleText == 'show' ? this.toggleText='hide' : this.toggleText='show';
   }
 
   delete(i){
-    this.jsonData[this.imageCurrIndex].keyTag.splice(i,1);
-  }
-
-  clearStorage(){
-    if(this.isclear) {
-      localStorage.removeItem('tagMeData');
-      location.reload();
-    }
+    this.tags[this.imageCurrIndex].keyTag.splice(i,1);
+    this.tags[this.imageCurrIndex].keyTagStr = this.tags[this.imageCurrIndex].keyTag.join(";")
+    let k = this.tags[this.imageCurrIndex].key
+    let obj = {keyTagStr : this.tags[this.imageCurrIndex].keyTagStr}
+    this.updateItem(k,obj)
   }
 
 
+  onNativeChange(e) { // here e is a native event
+    let k = this.tags[this.imageCurrIndex].key
+    let obj = {multiTag : e.target.checked}
+    this.updateItem(k, obj)
+  }
 
   downloadCSVFile(){
     const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
-    const header = Object.keys(this.jsonData[0]);
-    let csv = this.jsonData.map(row => {
+    let header_all = Object.keys(this.tags[0]);
+    // header.splice(0,1)
+    let header = header_all.filter(e => e !== 'key')
+     header = header.filter(e => e !== 'keyTagStr')
+
+    let csv = this.tags.map(row => {
       return header.map(fieldname=> {
         let data = fieldname == 'keyTag' ? row[fieldname].join(';') : row[fieldname];
         return JSON.stringify(data,replacer)
@@ -340,6 +392,48 @@ export class KeytagmeComponent implements OnInit {
     saveAs(blob, fileName);
   }
 
+  upload() {
+    for (let i = 0; i < this.selectedFiles.length; i++) {
+      this.uploadService.uploadFile( this.selectedFiles[i]);
+      let d_obj = {}
+            let f_name = "https://s3.amazonaws.com/tagmeimages/"+ this.selectedFiles[i].name
+            d_obj['imageUrl'] = f_name
+            d_obj['keyTag'] = []
+            d_obj['keyTagStr'] = ""
+            d_obj['notes'] = ""
+            d_obj['timeSpent'] = 0
+            d_obj['multiTag'] = false
+            this.addItem(d_obj)
+    }
+      this.getTagsLen()
+  }
+    
+  selectFile(event) {
+    this.selectedFiles = event.target.files;
+  }
+
+
+  readtxtFile(){
+      this.htpclt.get('./assets/tags.txt',{responseType:'text'})
+      .subscribe(data=>{
+        // console.log(typeof(data));
+        let fdata = data.split('\n');
+        this.showtxtFileData = fdata
+        // console.log(fdata);
+        this.txtFileData = [];
+        fdata.forEach(ele=>{
+          let fele = ele.split(':')
+          let o = {};
+          o[fele[0].trim()] = fele[1].trim();
+          this.txtFileData.push(o);
+        })
+        // console.log(this.txtFileData);
+      }, err => {
+        console.log("ERROR", err);
+      })
+    }
+  
+}
 
   // readCsvData () {
   //   this.htpclt.get('./assets/sample.csv',{responseType:'text'})
@@ -389,104 +483,60 @@ export class KeytagmeComponent implements OnInit {
   // }
 
 
-
-  upload() {
-    // const file = this.selectedFiles.item(0);
-
-
-    for (let i = 0; i < this.selectedFiles.length; i++) {
-      this.uploadService.uploadFile( this.selectedFiles[i]);
-      let d_obj = {}
-            let f_name = "https://s3.amazonaws.com/tagmeimages/"+ this.selectedFiles[i].name
-            d_obj['imageUrl'] = f_name
-            d_obj['keyTag'] = []
-            d_obj['notes'] = ""
-            d_obj['timeSpent'] = 0
-            d_obj['multiTag'] = false
-            this.csvData.push(d_obj)
-    }
-    this.jsonData = this.csvData
-    this.jsonDataLen = this.jsonData.length;
-    localStorage.setItem("tagMeData",JSON.stringify(this.jsonData))
+  // clearStorage(){
+  //   if(this.isclear) {
+  //     localStorage.removeItem('tagMeData');
+  //     location.reload();
+  //   }
+  // }
 
 
-    // this.selectedFiles = [];
-    }
-    
-    selectFile(event) {
-    this.selectedFiles = event.target.files;
-    }
-
-
-
-    getFiles() {
-      let that = this
-      let imageList = []
-      console.log(imageList)
-      const bucket = new S3(
-          {
-              accessKeyId: 'XXX',
-              secretAccessKey: 'XXX',
-              region: 'us-east-1'
-          }
-          );
-      const params = {
-          Bucket: 'tagmeimages',
-          // Prefix: this.FOLDER
-      };
+  // getFiles() {
+    //   let that = this
+    //   let imageList = []
+    //   console.log(imageList)
+    //   const bucket = new S3(
+    //       {
+    //           accessKeyId: 'xxx',
+    //           secretAccessKey: 'xxx',
+    //           region: 'us-east-1'
+    //       }
+    //       );
+    //   const params = {
+    //       Bucket: 'tagmeimages',
+    //       // Prefix: this.FOLDER
+    //   };
    
-      bucket.listObjects(params, function (err, data) {
-        if (err) {
-          console.log('There was an error getting your files: ' + err);
-          return;
-        }
+    //   bucket.listObjects(params, function (err, data) {
+    //     if (err) {
+    //       console.log('There was an error getting your files: ' + err);
+    //       return;
+    //     }
    
-        console.log('Successfully get files.', data);
+    //     console.log('Successfully get files.', data);
    
-        const fileDatas = data.Contents;
-        let lines = []
+    //     const fileDatas = data.Contents;
+    //     let lines = []
 
-        fileDatas.forEach(function (file) {
-          // for ( let i = 0; i < imageList.length; i++) {
-            let d_obj = {}
-            let f_name = "https://s3.amazonaws.com/tagmeimages/"+ file.Key
-            d_obj['imageUrl'] = f_name
-            d_obj['keyTag'] = []
-            d_obj['notes'] = ""
-            d_obj['timeSpent'] = 0
-            d_obj['multiTag'] = false
-    
-            lines.push(d_obj);
-    
-          // }
+    //     fileDatas.forEach(function (file) {
+    //         let d_obj = {}
+    //         let f_name = "https://s3.amazonaws.com/tagmeimages/"+ file.Key
+    //         d_obj['imageUrl'] = f_name
+    //         d_obj['keyTag'] = []
+    //         d_obj['notes'] = ""
+    //         d_obj['timeSpent'] = 0
+    //         d_obj['multiTag'] = false
+    //         lines.push(d_obj);
+    //     });
+    //     // console.log(lines);
+    //     that.csvData = lines;
+    //     that.assignDataInit(lines)
+    //     that.readtxtFile();
+    //     that.startTimeInterval();
+    //   });
+
+    // }
+
+
     
 
-        });
-        // imageList = data.Contents
-
-        console.log(lines);
-        that.csvData = lines;
-        that.assignDataInit(lines)
-        that.readtxtFile();
-        that.startTimeInterval();
-        
-        // let f_name = ""
-        // fileDatas.forEach(function (file) {
-        //   console.log("-----",file)
-        //   f_name = "https://s3.amazonaws.com/tagemeimages/"+ file.Key
-        //   imageList.push(f_name)
-        //   // fileUploads.push(new FileUpload(file.Key, 'https://s3.amazonaws.com/' + params.Bucket + '/' + file.Key));
-        // });
-      });
-
-      // this.assignDataInit(this.csvData);
-      
-   
-      // imageUrl,keyTag,notes,timeSpent,multiTag
-
-      // return imageList
-      // return Observable.of(fileUploads);
-    }
-
-  
-}

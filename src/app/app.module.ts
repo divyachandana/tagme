@@ -11,6 +11,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatGridListModule } from '@angular/material';
+import { environment } from '../environments/environment';
+import { AngularFireModule } from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
 
 @NgModule({
   declarations: [
@@ -25,6 +28,8 @@ import { MatGridListModule } from '@angular/material';
     MatGridListModule,
     RouterModule.forRoot(routes),
     BrowserAnimationsModule,
+    AngularFireModule.initializeApp(environment.firebase, 'tagme-d7dd6'),
+    AngularFireDatabaseModule
 
   ],
   providers: [],

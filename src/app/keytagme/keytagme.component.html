@@ -1,25 +1,36 @@
 
-<div *ngIf="jsonData.length>0" class="flex-container">
+<!-- can be deleted ********** -->
+<!-- <button (click)="AddBook()">Add a book!</button>
+<div>hello</div>
+<ul>
+    <li *ngFor="let tag of tags">
+        <pre>{{tag.title}}</pre>
+    </li>
+</ul>
+<div>hello</div> -->
+<!-- can be deleted ************* -->
 
-    <div style="flex-grow: 1"  style="width: 20%;">
+<div *ngIf="tags?.length>0" class="flex-container">
+
+    <div style="flex-grow: 1"  style="width: 15%;">
             <div *ngIf="imagePrevIndex!=-1">
-                <p>{{jsonData[imagePrevIndex].keyTag}}</p>
-                <img  [src]=jsonData[imagePrevIndex].imageUrl>
+                <p>{{tags[imagePrevIndex].keyTag}}</p>
+                <img  [src]=tags[imagePrevIndex].imageUrl>
                 <hr>
             </div>
 
             <div>
                 <button mat-button color="accent" (click)="toggle()">{{toggleText}}</button>
-                    <div *ngIf="toggleText=='show'">
-                        <div *ngFor="let sd of showtxtFileData" style="text-transform: capitalize;">
-                            {{sd}}
-                        </div>
+                <div *ngIf="toggleText=='show'">
+                    <div *ngFor="let sd of showtxtFileData" style="text-transform: capitalize;">
+                        {{sd}}
                     </div>
-                <br>
+                </div>
+                <!-- <br>
                 <input type="checkbox" [(ngModel)]="isclear">
                 <label for="isclear"> Clear All Data</label><br> 
-                <button mat-button color="accent" (click)="clearStorage()">Clear</button>    
-                <hr>        
+                <button mat-button color="accent" (click)="clearStorage()">Clear</button>    -->
+                <hr>         
              </div>
 
              <label class="btn btn-default">
@@ -27,24 +38,24 @@
               </label>
     </div>
 
-    <div style="flex-grow: 8"  style="width: 60%;" >
-            <p class="horizontal" *ngFor="let s of jsonData[imageCurrIndex].keyTag;let i=index">{{s}} 
+    <div style="flex-grow: 8"  style="width: 70%;" >
+            <p class="horizontal" *ngFor="let s of tags[imageCurrIndex].keyTag;let i=index">{{s}} 
                 <span class="hori" (click)=delete(i)></span>
             </p>
-            <img class="center" [src]=jsonData[imageCurrIndex].imageUrl>
+            <img class="center" [src]=tags[imageCurrIndex].imageUrl>
     </div>
 
-    <div style="flex-grow: 1"  style="width: 20%;">
-            <div *ngIf="imageNextIndex!=jsonDataLen && jsonData.length>0">
-                <p>{{jsonData[imageNextIndex].keyTag}} </p>
-                <img [src]=jsonData[imageNextIndex].imageUrl>
+    <div style="flex-grow: 1"  style="width: 15%;">
+            <div *ngIf="imageNextIndex!=jsonDataLen && tags?.length>0">
+                <p>{{tags[imageNextIndex].keyTag}} </p>
+                <img [src]=tags[imageNextIndex].imageUrl>
                 <hr>
             </div> 
 
             <div>
                 <input type="checkbox" [(ngModel)]="checked">
                 <label for="autoscroll"> AutoScroll</label><br> 
-                <input type="checkbox" [(ngModel)]="jsonData[imageCurrIndex].multiTag">
+                <input type="checkbox" [(ngModel)]="tags[imageCurrIndex].multiTag" (change)="onNativeChange($event)">
                 <label for="multitags"> Allow Multi Tags</label>
                 <hr>
                 <br>            
@@ -65,14 +76,14 @@
         <button class="btn btn-success" [disabled]="!selectedFiles" (click)="upload()">Upload</button>
     </div>
     <div style="flex-grow: 4">
-        <textarea *ngIf="jsonData.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
-            [(ngModel)]=jsonData[imageCurrIndex].notes 
+        <textarea *ngIf="tags?.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+            [(ngModel)]=tags[imageCurrIndex].notes 
             placeholder="Describe the image" rows="12" cols="50"></textarea>
     </div>
     <div style="flex-grow: 5">
         <div style="max-height:250px;overflow-y:scroll;">
-            <div *ngFor="let s of jsonData;let i=index">
-                <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':s.keyTag.length>0?'#87CEFA':''}" style="cursor: pointer;">{{(s.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}</div>
+            <div *ngFor="let tag of tags; let i=index">
+                <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':tag.keyTag.length>0?'#87CEFA':''}" style="cursor: pointer;">{{(tag.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}</div>
             </div>   
         </div>  
     </div>
