@@ -159,9 +159,24 @@ deleteEverything() {
   this.itemsRef.remove();
 }
 
-focusOnNotes(){
-  this._inputElement.nativeElement.focus();
+deleteConfirm(key:string) {
+  if(confirm("Are you sure to delete?")) {
+    // console.log("Implement delete functionality here");
+    this.deleteItem(key)
+  }
 }
+
+// focusOnNotes(){
+//   setTimeout(()=>{
+//     this._inputElement.nativeElement.focus();
+//   },100)
+// }
+
+// updateNotes(data){
+//   let obj = {notes: data}
+//   this.updateItem(this.tags[this.imageCurrIndex].key,obj)
+
+// }
 
 assignDataInit(){
     // this.jsonData = myData.length >0 ? myData : [];
@@ -218,7 +233,7 @@ assignDataInit(){
           Object.keys(this.alphaNumericKeys).forEach((value)=>{
             if(parseInt(value) === event.keyCode){
               if(this.isMouseHoveredonNotes){
-                console.log(this.tags[this.imageCurrIndex]);
+                // console.log(this.tags[this.imageCurrIndex]);
               } else {
                 // let index = this.txtFileData.map((x)=>x.key).indexOf(this.alphaNumericKeys[value]);
                 let isexists = ""
@@ -276,6 +291,10 @@ assignDataInit(){
                     setTimeout(()=>{
                       this.gotoNext();},100)
                   }                 
+                } else {
+                  // if(!this.tags[this.imageCurrIndex].multiTag){
+                  //   this.focusOnNotes()
+                  // }
                 }
 
               }
@@ -409,6 +428,8 @@ assignDataInit(){
             d_obj['notes'] = ""
             d_obj['timeSpent'] = 0
             d_obj['multiTag'] = false
+            // create new elements reference huan
+            // d_obj['resilience'] = ''
             this.addItem(d_obj)
     }
       this.getTagsLen()
