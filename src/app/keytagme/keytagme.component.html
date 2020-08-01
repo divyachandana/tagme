@@ -11,8 +11,7 @@
 <!-- can be deleted ************* -->
 
 <div *ngIf="tags?.length>0" class="flex-container">
-
-    <div style="flex-grow: 1"  style="width: 15%;">
+    <div style="flex-grow: 1"  style="width: 25%;">
             <div *ngIf="imagePrevIndex!=-1">
                 <p>{{tags[imagePrevIndex].keyTag}}</p>
                 <img  [src]=tags[imagePrevIndex].imageUrl>
@@ -30,63 +29,75 @@
                 <input type="checkbox" [(ngModel)]="isclear">
                 <label for="isclear"> Clear All Data</label><br> 
                 <button mat-button color="accent" (click)="clearStorage()">Clear</button>    -->
-                <hr>         
+                <hr> 
+                <div>
+                    <input type="checkbox" [(ngModel)]="checked">
+                    <label for="autoscroll"> AutoScroll</label><br> 
+                    <input type="checkbox" [(ngModel)]="tags[imageCurrIndex].multiTag" (change)="onNativeChange($event)">
+                    <label for="multitags"> Allow Multi Tags</label>
+                    <hr>
+                    <br>            
+                </div>
+
              </div>
+             <div style="max-height:300px;overflow-y:scroll;max-width: 550px;overflow-x: scroll;display: inline-block;">
+                <div *ngFor="let tag of tags; let i=index">
+                    <!-- <div class="side_by_side" (click)=deleteItem(tag.key) ></div> -->
+                    <div (click)=deleteItem(tag.key) style="cursor: pointer;font-size: small;display: inline-block;">X &nbsp;</div>
+                    <div (click)="navigate(i,n+i)" id="n{{i}}"  
+                        [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':tag.keyTag.length>0?'#87CEFA':''}" 
+                        class="side_by_side"
+                        style="cursor: pointer;font-size: small;display: inline-block;">
+                        {{(tag.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}
+
+                    </div>
+
+                </div>   
+            </div>  
+            <hr>
 
              <label class="btn btn-default">
                 <button mat-button color="accent" (click)="downloadCSVFile()">Download</button>
               </label>
     </div>
 
-    <div style="flex-grow: 8"  style="width: 70%;" >
+    <div style="flex-grow: 7"  style="width: 55%;" >
             <p class="horizontal" *ngFor="let s of tags[imageCurrIndex].keyTag;let i=index">{{s}} 
                 <span class="hori" (click)=delete(i)></span>
             </p>
-            <img class="center" [src]=tags[imageCurrIndex].imageUrl>
+            <img class="center" style="vertical-align: baseline;" [src]=tags[imageCurrIndex].imageUrl>
     </div>
 
-    <div style="flex-grow: 1"  style="width: 15%;">
+    <div style="flex-grow: 1"  style="width: 20%;">
             <div *ngIf="imageNextIndex!=jsonDataLen && tags?.length>0">
                 <p>{{tags[imageNextIndex].keyTag}} </p>
                 <img [src]=tags[imageNextIndex].imageUrl>
                 <hr>
             </div> 
-
-            <div>
-                <input type="checkbox" [(ngModel)]="checked">
-                <label for="autoscroll"> AutoScroll</label><br> 
-                <input type="checkbox" [(ngModel)]="tags[imageCurrIndex].multiTag" (change)="onNativeChange($event)">
-                <label for="multitags"> Allow Multi Tags</label>
-                <hr>
-                <br>            
-            </div>
-
-            <!-- <div> -->
-  
-            <!-- </div> -->
+            <textarea *ngIf="tags?.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
+                [(ngModel)]=tags[imageCurrIndex].notes 
+                placeholder="Describe the image" rows="12" cols="35" #myInput></textarea>        
+            <hr> 
               
     </div>    
 </div>
 <hr>
 <div class="flex-container">
-    <div style="flex-grow: 1">
+    <div style="flex-grow: 10">
         <label class="btn btn-default">
             <input type="file" (change)="selectFile($event)" multiple="multiple">
         </label>  
         <button class="btn btn-success" [disabled]="!selectedFiles" (click)="upload()">Upload</button>
+
+        <hr>
+        <iframe src="http://34.71.207.145:8041/" width="100%" height="500px"></iframe>
     </div>
-    <div style="flex-grow: 4">
-        <textarea *ngIf="tags?.length>0" class="txt-area-center" (mouseenter)="mouseHover($event)" (mouseleave)="mouseLeave($event)"
-            [(ngModel)]=tags[imageCurrIndex].notes 
-            placeholder="Describe the image" rows="12" cols="50"></textarea>
+    <!-- <div style="flex-grow: 4">
+       
     </div>
     <div style="flex-grow: 5">
-        <div style="max-height:250px;overflow-y:scroll;">
-            <div *ngFor="let tag of tags; let i=index">
-                <div (click)="navigate(i,n+i)" id="n{{i}}" [ngStyle]="{background:i==imageCurrIndex?'#9ACD32':tag.keyTag.length>0?'#87CEFA':''}" style="cursor: pointer;">{{(tag.imageUrl+'').replace('https://s3.amazonaws.com/tagmeimages/','')}}</div>
-            </div>   
-        </div>  
-    </div>
+
+    </div> -->
 </div>
 
 <!-- <div class="flex-container">

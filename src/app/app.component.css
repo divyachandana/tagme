@@ -49,7 +49,7 @@
 
   .content {
     display: flex;
-    margin: 32px auto;
+    margin: 1px auto;
     padding: 0 16px;
     max-width: 960px;
     flex-direction: column;

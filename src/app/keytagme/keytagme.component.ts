@@ -14,7 +14,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import {AngularFireList} from 'angularfire2/database';
 import { Observable, pipe } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import { ViewChild,ElementRef } from '@angular/core'
 
 // class myTags {
 //   constructor(public title) { }
@@ -102,8 +102,9 @@ export class KeytagmeComponent implements OnInit {
 
   tags: any = [];
   itemsRef: AngularFireList<any>;
-
   courses$: Observable<any[]>;
+  @ViewChild("myInput", {static: false}) private _inputElement: ElementRef;
+
 
   constructor(public htpclt:HttpClient, 
     public cdref:ChangeDetectorRef, 
@@ -130,10 +131,11 @@ export class KeytagmeComponent implements OnInit {
         this.tags = data;
         // console.log(this.tags)
         that.jsonDataLen = data.length
-        that.assignDataInit();
-        that.readtxtFile();
-        that.startTimeInterval();
+
       })
+      that.assignDataInit();
+      that.readtxtFile();
+      that.startTimeInterval();
 // debugger
       
 
@@ -155,6 +157,10 @@ deleteItem(key: string) {
 
 deleteEverything() {
   this.itemsRef.remove();
+}
+
+focusOnNotes(){
+  this._inputElement.nativeElement.focus();
 }
 
 assignDataInit(){
