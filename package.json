@@ -32,7 +32,7 @@
     "@angular/router": "^8.2.14",
     "angular-font-awesome": "^3.1.2",
     "angularfire2": "^5.4.2",
-    "aws-sdk": "^2.717.0",
+    "aws-sdk": "^2.814.0",
     "bootstrap": "^4.4.1",
     "file-saver": "^2.0.2",
     "fine-uploader": "^5.16.2",
